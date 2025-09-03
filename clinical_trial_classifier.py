@@ -33,12 +33,12 @@ class ClinicalTrialClassifier:
     patient eligibility for clinical trials based on medical records and trial criteria.
     """
     
-    def __init__(self, model_name: str = "distilbert-base-uncased"):
+    def __init__(self, model_name: str = "emilyalsentzer/Bio_ClinicalBERT"):
         """
         Initialize the clinical trial classifier.
         
         Args:
-            model_name: HuggingFace model identifier for BERT variant
+            model_name: HuggingFace model identifier for clinical BERT variant
         """
         self.model_name = model_name
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
