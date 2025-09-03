@@ -16,103 +16,230 @@ parts/
 sdist/
 var/
 wheels/
+share/python-wheels/
 *.egg-info/
 .installed.cfg
 *.egg
 MANIFEST
 
-# Virtual environments
+# PyInstaller
+*.manifest
+*.spec
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+.pytest_cache/
+cover/
+
+# Translations
+*.mo
+*.pot
+
+# Django stuff:
+*.log
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+
+# Flask stuff:
+instance/
+.webassets-cache
+
+# Scrapy stuff:
+.scrapy
+
+# Sphinx documentation
+docs/_build/
+
+# PyBuilder
+.pybuilder/
+target/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# IPython
+profile_default/
+ipython_config.py
+
+# pyenv
+.python-version
+
+# pipenv
+Pipfile.lock
+
+# poetry
+poetry.lock
+
+# pdm
+.pdm.toml
+
+# PEP 582
+__pypackages__/
+
+# Celery stuff
+celerybeat-schedule
+celerybeat.pid
+
+# SageMath parsed files
+*.sage.py
+
+# Environments
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.venv
 env/
 venv/
 ENV/
 env.bak/
 venv.bak/
-.venv/
-.env/
 
-# IDE
-.vscode/
+# Spyder project settings
+.spyderproject
+.spyproject
+
+# Rope project settings
+.ropeproject
+
+# mkdocs documentation
+/site
+
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Pyre type checker
+.pyre/
+
+# pytype static type analyzer
+.pytype/
+
+# Cython debug symbols
+cython_debug/
+
+# PyCharm
 .idea/
-*.swp
-*.swo
-*~
 
-# Jupyter Notebooks
-.ipynb_checkpoints
-
-# Model files and cache
-*.bin
-*.safetensors
-models/
-cache/
-.cache/
-model_cache/
-transformers_cache/
-huggingface_hub/
-torch_extensions/
+# VS Code
+.vscode/
+*.code-workspace
 
 # Data files
 data/
 datasets/
 *.csv
 *.json
-*.pkl
+*.jsonl
+*.parquet
+*.feather
 *.h5
 *.hdf5
+*.pkl
+*.pickle
 
-# Logs and temporary files
+# Model files
+models/
+checkpoints/
+*.pth
+*.pt
+*.ckpt
+*.safetensors
+*.bin
+*.h5
+*.tflite
+*.onnx
+*.joblib
+
+# Logs
+logs/
 *.log
+wandb/
+.wandb/
+mlruns/
+.mlflow/
+
+# Temporary files
 *.tmp
+*.temp
 .DS_Store
 Thumbs.db
+*.swp
+*.swo
+*~
 
-# Security - No credentials or tokens
-.env
-.env.local
-.env.*.local
-credentials.json
-token.txt
-api_keys.txt
-*.key
+# Hugging Face specific
+.huggingface/
+hf_cache/
+transformers_cache/
+
+# Docker
+Dockerfile
+.dockerignore
+docker-compose.yml
+docker-compose.yaml
+
+# Database
+*.db
+*.sqlite
+
+# Certificates
 *.pem
+*.key
 *.crt
 
-# Project specific
-experiments/
-results/
-outputs/
-checkpoints/
-wandb/
-mlruns/
-lightning_logs/
-
-# Large files
-*.zip
-*.tar.gz
-*.rar
-*.7z
+# Secrets
+secrets/
+.secrets
+config.ini
+.config
 
 # OS generated files
-*.pid
-*.seed
-*.cover
-.coverage
-.nyc_output
-coverage.xml
-*.lcov
-.grunt
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
 
-# Healthcare AI specific
-patient_data/
-clinical_notes/
-phi_data/
-medical_records/
+# IDE
+*.sublime-project
+*.sublime-workspace
 
-# Testing artifacts
-.pytest_cache/
-.mypy_cache/
-htmlcov/
+# Vim
+*.swp
+*.swo
 
-# Documentation builds
-docs/_build/
-site/
+# Emacs
+*~
+\#*\#
+/.emacs.desktop
+/.emacs.desktop.lock
+*.elc
+auto-save-list
+tramp
+.\#*
+
+# Node.js (if using any JS tools)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
