@@ -5,14 +5,13 @@ Interactive demo for patient eligibility assessment.
 """
 
 import gradio as gr
-import pandas as pd
 import plotly.graph_objects as go
 import plotly.express as px
 from plotly.subplots import make_subplots
+import pandas as pd
 import numpy as np
-import json
-from clinical_trial_classifier import ClinicalTrialClassifier
 import logging
+from clinical_trial_classifier import ClinicalTrialClassifier
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -25,11 +24,14 @@ def initialize_classifier():
     """Initialize the clinical trial classifier."""
     global classifier
     try:
+        print("🔄 Initializing Clinical Trial Classifier...")
         classifier = ClinicalTrialClassifier()
         classifier.load_model()
+        print("✅ Classifier initialized successfully!")
         logger.info("Classifier initialized successfully")
         return True
     except Exception as e:
+        print(f"❌ Failed to initialize classifier: {e}")
         logger.error(f"Failed to initialize classifier: {e}")
         return False
 
@@ -64,6 +66,7 @@ def screen_patient_eligibility(patient_text: str, criteria_text: str):
     
     try:
         # Get prediction
+        print(f"🔍 Analyzing patient eligibility...")
         result = classifier.predict_eligibility(patient_text, criteria_text)
         
         # Format eligibility result
@@ -82,6 +85,8 @@ def screen_patient_eligibility(patient_text: str, criteria_text: str):
         # Create confidence visualization
         confidence_plot = create_confidence_plot(result)
         
+        print(f"✅ Analysis complete: {eligibility_status} ({result['confidence']:.1%} confidence)")
+        
         return (
             eligibility_label,
             result["confidence"],
@@ -90,11 +95,13 @@ def screen_patient_eligibility(patient_text: str, criteria_text: str):
         )
         
     except Exception as e:
-        logger.error(f"Error during screening: {e}")
+        error_msg = f"Error during processing: {str(e)}"
+        print(f"❌ {error_msg}")
+        logger.error(error_msg)
         return (
-            {"label": "Error", "confidences": [{"label": f"Processing error: {str(e)}", "confidence": 0.0}]},
+            {"label": "Error", "confidences": [{"label": error_msg, "confidence": 0.0}]},
             0.0,
-            f"❌ Error during processing: {str(e)}",
+            f"❌ {error_msg}",
             None
         )
 
@@ -136,6 +143,22 @@ def generate_reasoning_text(result: dict, patient_text: str, criteria_text: str)
     else:
         reasoning_parts.append("• Low confidence prediction - significant uncertainty")
         reasoning_parts.append("• Recommended action: Manual expert review required")
+    
+    # Extract key clinical factors
+    reasoning_parts.append("\n**KEY CLINICAL FACTORS DETECTED**:")
+    
+    # Simple keyword extraction for demonstration
+    patient_lower = patient_text.lower()
+    if "diabetes" in patient_lower:
+        reasoning_parts.append("• Diabetes diagnosis identified")
+    if "hba1c" in patient_lower or "hemoglobin" in patient_lower:
+        reasoning_parts.append("• HbA1c levels mentioned")
+    if "bmi" in patient_lower or "body mass" in patient_lower:
+        reasoning_parts.append("• BMI information provided")
+    if "cardiovascular" in patient_lower or "heart" in patient_lower:
+        reasoning_parts.append("• Cardiovascular history noted")
+    if "insulin" in patient_lower:
+        reasoning_parts.append("• Insulin therapy mentioned")
     
     # Safety disclaimers
     reasoning_parts.append("\n**⚠️ IMPORTANT DISCLAIMERS**:")
@@ -232,6 +255,35 @@ def load_demo_examples():
         return classifier.create_synthetic_demo_data()
     return []
 
+def load_example_1():
+    """Load first example."""
+    return (
+        """45-year-old female with Type 2 diabetes diagnosed 3 years ago. 
+Current medications: Metformin 1000mg twice daily, Lisinopril 10mg daily. 
+HbA1c: 7.2% (last measured 2 months ago). Blood pressure: 135/85 mmHg. 
+No history of cardiovascular events. BMI: 28.5 kg/m². Patient reports good 
+medication adherence and follows diabetic diet.""",
+        
+        """Inclusion Criteria: Adults aged 18-65 years, Type 2 diabetes 
+mellitus diagnosis, HbA1c between 7.0% and 10.0%, BMI 25-35 kg/m². 
+Exclusion Criteria: History of cardiovascular events, current insulin therapy, 
+pregnancy or nursing."""
+    )
+
+def load_example_2():
+    """Load second example."""
+    return (
+        """52-year-old male with Type 1 diabetes since childhood. 
+Currently on intensive insulin therapy with insulin pump. HbA1c: 8.1%. 
+BMI: 24.2 kg/m². No cardiovascular history. Blood pressure well controlled 
+at 120/80 mmHg.""",
+        
+        """Inclusion Criteria: Adults aged 18-65 years, Type 2 diabetes 
+mellitus diagnosis, HbA1c between 7.0% and 10.0%, BMI 25-35 kg/m². 
+Exclusion Criteria: History of cardiovascular events, current insulin therapy, 
+pregnancy or nursing."""
+    )
+
 def create_interface():
     """Create the Gradio interface for clinical trial screening."""
     
@@ -270,178 +322,114 @@ def create_interface():
         # Warning disclaimer
         gr.HTML("""
         <div class="warning-box">
-            <strong>⚠️ IMPORTANT DISCLAIMER:</strong> This is a research demonstration using synthetic data only. 
-            This system is not intended for actual clinical use and has not been validated by medical professionals 
-            or regulatory authorities. All patient examples are artificially generated for demonstration purposes.
+            <h4>⚠️ IMPORTANT DISCLAIMER</h4>
+            <p><strong>This is a research demonstration using synthetic data only.</strong> 
+            This system is not intended for actual clinical use and has not been validated 
+            by medical professionals or regulatory authorities. All patient data shown is 
+            artificially generated for demonstration purposes.</p>
         </div>
         """)
         
         with gr.Row():
             with gr.Column(scale=1):
-                gr.Markdown("## 📝 Input Patient and Trial Information")
+                gr.Markdown("### 📝 Input Information")
                 
                 patient_input = gr.Textbox(
                     label="Patient Clinical Notes",
-                    placeholder="Enter synthetic patient medical history, current medications, lab results, etc...",
+                    placeholder="Enter patient medical history, current medications, lab results, etc...",
                     lines=8,
-                    info="Provide detailed clinical information for the synthetic patient"
+                    value=""
                 )
                 
                 criteria_input = gr.Textbox(
-                    label="Trial Eligibility Criteria",
-                    placeholder="Enter inclusion and exclusion criteria for the clinical trial...",
+                    label="Clinical Trial Eligibility Criteria", 
+                    placeholder="Enter trial inclusion and exclusion criteria...",
                     lines=6,
-                    info="List the requirements and restrictions for trial participation"
+                    value=""
                 )
                 
                 with gr.Row():
                     screen_btn = gr.Button("🔍 Screen Patient", variant="primary", size="lg")
                     clear_btn = gr.Button("🗑️ Clear", variant="secondary")
                 
-                # Demo examples
-                gr.Markdown("## 📋 Demo Examples")
-                demo_examples = load_demo_examples()
-                
-                if demo_examples:
-                    for i, example in enumerate(demo_examples[:3], 1):
-                        with gr.Accordion(f"Example {i}: {example['scenario']}", open=False):
-                            gr.Textbox(
-                                value=example["patient_text"].strip(),
-                                label="Patient Text",
-                                lines=4,
-                                interactive=False
-                            )
-                            gr.Textbox(
-                                value=example["criteria_text"].strip(),
-                                label="Criteria Text", 
-                                lines=4,
-                                interactive=False
-                            )
-                            load_example_btn = gr.Button(f"Load Example {i}")
-                            
-                            # Create closure to capture current example
-                            def make_load_example(ex):
-                                def load_example():
-                                    return ex["patient_text"].strip(), ex["criteria_text"].strip()
-                                return load_example
-                            
-                            load_example_btn.click(
-                                make_load_example(example),
-                                outputs=[patient_input, criteria_input]
-                            )
+                gr.Markdown("### 📋 Example Cases")
+                with gr.Row():
+                    example1_btn = gr.Button("Load Example 1: Eligible Patient", variant="secondary")
+                    example2_btn = gr.Button("Load Example 2: Ineligible Patient", variant="secondary")
             
             with gr.Column(scale=1):
-                gr.Markdown("## 🎯 Screening Results")
+                gr.Markdown("### 🎯 Screening Results")
                 
-                eligibility_output = gr.Label(
-                    label="Eligibility Decision",
-                    num_top_classes=2
-                )
+                eligibility_output = gr.Label(label="Eligibility Decision", scale=2)
                 
-                confidence_output = gr.Number(
-                    label="Overall Confidence Score",
-                    precision=3
-                )
+                with gr.Row():
+                    confidence_output = gr.Number(
+                        label="Confidence Score", 
+                        precision=3,
+                        interactive=False
+                    )
                 
                 reasoning_output = gr.Textbox(
-                    label="Clinical Reasoning & Analysis",
-                    lines=12,
+                    label="Clinical Analysis & Reasoning", 
+                    lines=10,
                     interactive=False
                 )
                 
-                confidence_plot = gr.Plot(
-                    label="Prediction Analysis Visualization"
-                )
+                attention_plot = gr.Plot(label="Confidence Visualization")
         
         # Event handlers
         screen_btn.click(
             screen_patient_eligibility,
             inputs=[patient_input, criteria_input],
-            outputs=[eligibility_output, confidence_output, reasoning_output, confidence_plot]
+            outputs=[eligibility_output, confidence_output, reasoning_output, attention_plot]
         )
         
         clear_btn.click(
             lambda: ("", "", None, 0.0, "", None),
-            outputs=[patient_input, criteria_input, eligibility_output, confidence_output, reasoning_output, confidence_plot]
+            outputs=[patient_input, criteria_input, eligibility_output, confidence_output, reasoning_output, attention_plot]
         )
         
-        # Information tabs
-        with gr.Tabs():
-            with gr.Tab("ℹ️ About This System"):
-                gr.Markdown("""
-                ### 🎯 Purpose
-                This AI system demonstrates advanced natural language processing for healthcare applications. 
-                It uses clinical BERT models to understand complex medical text and make eligibility assessments.
-                
-                ### 🧠 How It Works
-                1. **Text Processing**: Clinical notes and trial criteria are preprocessed and normalized
-                2. **AI Analysis**: A specialized clinical BERT model analyzes the text pair
-                3. **Decision Making**: The system predicts eligibility with confidence scoring
-                4. **Interpretation**: Results include reasoning and attention visualization
-                
-                ### 🔬 Technical Details
-                - **Model**: Clinical BERT (BioBERT/ClinicalBERT variants)
-                - **Task**: Binary text-pair classification
-                - **Performance**: >85% accuracy on synthetic test data
-                - **Safety**: Comprehensive bias testing and ethical guidelines
-                """)
-            
-            with gr.Tab("🛡️ Safety & Ethics"):
-                gr.Markdown("""
-                ### 🔒 Data Privacy
-                - All examples use synthetic, artificially generated data
-                - No real patient information is processed or stored
-                - Designed with HIPAA compliance principles in mind
-                
-                ### ⚖️ Bias & Fairness
-                - Tested across multiple demographic groups
-                - Continuous monitoring for unfair bias
-                - Transparent reporting of limitations
-                
-                ### 📋 Regulatory Considerations
-                - Research and demonstration purpose only
-                - Requires clinical validation for real-world use
-                - Follows FDA guidance for AI/ML in medical devices
-                - Not a substitute for professional medical judgment
-                """)
-            
-            with gr.Tab("📊 Performance Metrics"):
-                gr.Markdown("""
-                ### 🎯 Model Performance
-                - **Accuracy**: >85% on synthetic test dataset
-                - **Precision**: >90% (minimizing false positives)
-                - **Recall**: >80% (minimizing missed eligible patients)
-                - **F1-Score**: >85% balanced performance metric
-                
-                ### ⚡ System Performance
-                - **Response Time**: <2 seconds average
-                - **Throughput**: Optimized for interactive use
-                - **Reliability**: Comprehensive error handling
-                - **Scalability**: Designed for concurrent users
-                
-                ### 🔍 Quality Assurance
-                - Extensive unit and integration testing
-                - Bias detection and mitigation
-                - Performance monitoring and alerting
-                - Regular model validation and updates
-                """)
+        example1_btn.click(
+            load_example_1,
+            outputs=[patient_input, criteria_input]
+        )
+        
+        example2_btn.click(
+            load_example_2,
+            outputs=[patient_input, criteria_input]
+        )
+        
+        # Footer
+        gr.HTML("""
+        <div style="text-align: center; margin-top: 30px; padding: 20px; border-top: 1px solid #eee;">
+            <h4>🔬 Advanced Healthcare AI Portfolio Project</h4>
+            <p>Demonstrating sophisticated NLP capabilities for clinical applications with ethical AI principles.</p>
+            <p><em>Built with PyTorch, Transformers, and Gradio for healthcare AI research.</em></p>
+        </div>
+        """)
     
     return demo
 
 def main():
     """Main function to launch the application."""
     
+    print("=" * 60)
+    print("🏥 CLINICAL TRIAL SCREENING AI")
+    print("=" * 60)
+    
     # Initialize the classifier
-    print("🏥 Initializing Clinical Trial Screening AI...")
+    print("🔄 Initializing Clinical Trial Screening AI...")
     
     if not initialize_classifier():
-        print("❌ Failed to initialize classifier. Please check your setup.")
+        print("❌ Failed to initialize classifier. Exiting...")
         return
     
     print("✅ Classifier initialized successfully!")
     
     # Create and launch interface
     print("🚀 Launching web interface...")
+    print("📡 Server will be available at: http://localhost:7860")
+    print("🔧 Use Ctrl+C to stop the server")
     
     demo = create_interface()
     
@@ -449,8 +437,8 @@ def main():
     demo.launch(
         server_name="0.0.0.0",
         server_port=7860,
-        share=False,
-        debug=False,
+        share=True,
+        debug=True,
         show_error=True
     )
 
