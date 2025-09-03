@@ -1,0 +1,118 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual environments
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+.venv/
+.env/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Jupyter Notebooks
+.ipynb_checkpoints
+
+# Model files and cache
+*.bin
+*.safetensors
+models/
+cache/
+.cache/
+model_cache/
+transformers_cache/
+huggingface_hub/
+torch_extensions/
+
+# Data files
+data/
+datasets/
+*.csv
+*.json
+*.pkl
+*.h5
+*.hdf5
+
+# Logs and temporary files
+*.log
+*.tmp
+.DS_Store
+Thumbs.db
+
+# Security - No credentials or tokens
+.env
+.env.local
+.env.*.local
+credentials.json
+token.txt
+api_keys.txt
+*.key
+*.pem
+*.crt
+
+# Project specific
+experiments/
+results/
+outputs/
+checkpoints/
+wandb/
+mlruns/
+lightning_logs/
+
+# Large files
+*.zip
+*.tar.gz
+*.rar
+*.7z
+
+# OS generated files
+*.pid
+*.seed
+*.cover
+.coverage
+.nyc_output
+coverage.xml
+*.lcov
+.grunt
+
+# Healthcare AI specific
+patient_data/
+clinical_notes/
+phi_data/
+medical_records/
+
+# Testing artifacts
+.pytest_cache/
+.mypy_cache/
+htmlcov/
+
+# Documentation builds
+docs/_build/
+site/
