@@ -2,9 +2,12 @@
 Script to create a Hugging Face Space for this project. Requires HUGGINGFACE_TOKEN in environment.
 """
 import os
-# Load environment variables from .env
-from dotenv import load_dotenv
-load_dotenv()
+# Attempt to load environment variables from .env if python-dotenv is available
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+except ImportError:
+    print("python-dotenv not installed; ensure HUGGINGFACE_TOKEN is set in environment.")
 from huggingface_hub import HfApi, HfFolder
 
 def main():
