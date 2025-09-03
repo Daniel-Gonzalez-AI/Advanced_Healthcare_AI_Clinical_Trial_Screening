@@ -91,7 +91,6 @@ def test_synthetic_data_generation(classifier):
         
         # Verify structure of first example
         example = demo_data[0]
-        required_.py
         required_keys = ['patient_text', 'criteria_text', 'expected_eligible', 'description']
         for key in required_keys:
             if key not in example:
