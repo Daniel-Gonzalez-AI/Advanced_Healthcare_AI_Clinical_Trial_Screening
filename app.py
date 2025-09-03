@@ -50,7 +50,7 @@ def screen_patient_eligibility(patient_text: str, criteria_text: str):
     
     if not classifier:
         return (
-            {"label": "Error", "confidences": [{"label": "System not initialized", "confidence": 0.0}]},
+            {"Error": 1.0},
             0.0,
             "❌ Error: System not initialized. Please refresh the page.",
             None
@@ -58,7 +58,7 @@ def screen_patient_eligibility(patient_text: str, criteria_text: str):
     
     if not patient_text.strip() or not criteria_text.strip():
         return (
-            {"label": "Error", "confidences": [{"label": "Missing input", "confidence": 0.0}]},
+            {"Missing input": 1.0},
             0.0,
             "⚠️ Please provide both patient information and trial criteria.",
             None
@@ -72,11 +72,7 @@ def screen_patient_eligibility(patient_text: str, criteria_text: str):
         # Format eligibility result
         eligibility_status = "✅ ELIGIBLE" if result["eligible"] else "❌ NOT ELIGIBLE"
         eligibility_label = {
-            "label": eligibility_status,
-            "confidences": [
-                {"label": "Eligible", "confidence": result["probability_eligible"]},
-                {"label": "Not Eligible", "confidence": result["probability_not_eligible"]}
-            ]
+            "✅ ELIGIBLE" if result["eligible"] else "❌ NOT ELIGIBLE": result["confidence"]
         }
         
         # Generate reasoning text
@@ -99,7 +95,7 @@ def screen_patient_eligibility(patient_text: str, criteria_text: str):
         print(f"❌ {error_msg}")
         logger.error(error_msg)
         return (
-            {"label": "Error", "confidences": [{"label": error_msg, "confidence": 0.0}]},
+            {"Error": 1.0},
             0.0,
             f"❌ {error_msg}",
             None
@@ -437,7 +433,7 @@ def main():
     demo.launch(
         server_name="0.0.0.0",
         server_port=7860,
-        share=True,
+        share=False,
         debug=True,
         show_error=True
     )
